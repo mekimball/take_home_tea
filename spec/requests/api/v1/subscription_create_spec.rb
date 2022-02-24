@@ -8,17 +8,27 @@ RSpec.describe 'Subscriptions' do
     @subscription_1 = Subscription.create!(title: 'basic', price: 5.99, status: 'active', frequency: 'every two weeks', customer_id: @customer_1.id, tea_id: @tea_1.id)
   end
   it 'can create a subscription' do
-    subscription_params = { 
-      name: 'premium',
+    subscription_params = {
+      title: 'premium',
       price: 10.99,
       status: 'active',
       frequency: 'every week',
       customer_id: @customer_1.id,
       tea_id: @tea_2.id
-     }
+    }
     headers = { 'CONTENT_TYPE' => 'application/json' }
     post "/api/v1/customers/#{@customer_1.id}/subscriptions", headers: headers,
                           params: JSON.generate(subscription: subscription_params)
-    expect(response).to be_successful
+    created_subscription = Subscription.last
+
+    expect(response.status).to eq(201)
+    
+    expect(created_subscription.title).to eq('premium')
+    expect(created_subscription.price).to eq(10.99)
+    expect(created_subscription.status).to eq('active')
+    expect(created_subscription.frequency).to eq('every week')
+    expect(created_subscription.customer_id).to eq(@customer_1.id)
+    expect(created_subscription.tea_id).to eq(@tea_2.id)
+
   end
 end
