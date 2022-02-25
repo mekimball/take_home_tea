@@ -65,4 +65,26 @@ RSpec.describe 'Subscriptions' do
       expect(sub[:attributes][:price]).to be_a(Float)
     end
   end
+
+  it "returns an error if it can't create a subscription" do
+    subscription_params = {
+      title: 'premium',
+      price: 10.99,
+      status: 'active',
+      customer_id: @customer_1.id,
+      tea_id: @tea_2.id
+    }
+    headers = { 'CONTENT_TYPE' => 'application/json' }
+    post "/api/v1/customers/#{@customer_1.id}/subscriptions", headers: headers,
+                          params: JSON.generate(subscription: subscription_params)
+    created_subscription = Subscription.last
+
+    expect(response.status).to eq(400)
+  end
+
+  it 'can returns an error if customer does not exist' do
+    get "/api/v1/customers/999999/subscriptions"
+
+    expect(response.status).to eq(400)
+  end
 end
