@@ -1,6 +1,11 @@
 class Api::V1::SubscriptionsController < ApplicationController
   def create
-    render json: SubscriptionSerializer.new(Subscription.create(subscription_params)), status: 201
+    test = Subscription.new(subscription_params)
+    if test.save
+      render json: SubscriptionSerializer.new(test), status: 201
+    else
+      render json: { errors: { details: "Please enter all information" } }, status: 400
+    end
   end
 
   def update
@@ -10,7 +15,11 @@ class Api::V1::SubscriptionsController < ApplicationController
   end
 
   def index
-    render json: SubscriptionSerializer.new(Subscription.all.where("customer_id = ?", params[:customer_id]))
+    if Customer.where(id: params[:customer_id]).empty?
+      render json: { errors: { details: "Sorry, that user does not exist" } }, status: 400
+    else
+      render json: SubscriptionSerializer.new(Subscription.all.where("customer_id = ?", params[:customer_id]))
+    end
   end
 
   private
