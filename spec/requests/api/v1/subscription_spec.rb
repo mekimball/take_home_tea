@@ -43,15 +43,26 @@ RSpec.describe 'Subscriptions' do
     headers = { 'CONTENT_TYPE' => 'application/json' }
     patch "/api/v1/customers/#{@customer_1.id}/subscriptions/#{subscription_3.id}", headers: headers,
                           params: JSON.generate(subscription: update_params)
-    updated = Subscription.find_by(id: @subscription_2.id)
+    updated = Subscription.find_by(id: subscription_3.id)
     expect(response.status).to eq(201)
 
     expect(updated.status).to eq('inactive')
   end
 
-  xit 'can return all subscriptions from a customer' do
+  it 'can return all subscriptions from a customer' do
     get "/api/v1/customers/#{@customer_1.id}/subscriptions"
     parsed = JSON.parse(response.body, symbolize_names: true)
-    require 'pry'; binding.pry
+    subs = parsed[:data]
+
+    subs.each do |sub|
+      expect(sub).to have_key(:id)
+      expect(sub[:id]).to be_a(String)
+      expect(sub).to have_key(:type)
+      expect(sub[:type]).to be_a(String)
+      expect(sub[:attributes]).to have_key(:title)
+      expect(sub[:attributes][:title]).to be_a(String)
+      expect(sub[:attributes]).to have_key(:price)
+      expect(sub[:attributes][:price]).to be_a(Float)
+    end
   end
 end
