@@ -10,8 +10,7 @@ class Api::V1::SubscriptionsController < ApplicationController
   end
 
   def index
-    customer = 
-    require 'pry'; binding.pry
+    render json: SubscriptionSerializer.new(Subscription.all.where("customer_id = ?", params[:customer_id]))
   end
 
   private
